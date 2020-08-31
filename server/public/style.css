@@ -1,0 +1,8 @@
+* {
+    color: black
+}
+
+#app {
+    height: 2000px;
+    border: 5px solid black  
+}
