@@ -182,12 +182,12 @@ class App extends react__WEBPACK_IMPORTED_MODULE_0___default.a.Component {
     })), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
       onClick: () => this.createTask(this.state.newTaskTypeId, this.state.newTaskName)
     }, "Create new task"), selectedType.length ? selectedType[0].tasks.map(task => {
-      return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("li", {
+      return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("p", {
         key: task.id
-      }, task.name, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
+      }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
         className: "delete",
         onClick: () => this.deleteTask(task)
-      }, "X"));
+      }, "DONE"), task.name);
     }) : tasksByType.map(type => {
       return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("h3", {
         id: type.id,

@@ -41,8 +41,11 @@ export default class App extends React.Component {
 		return(
 			<div>
 				<label>Create new task here: </label>
-				<input type='text' id='new-task' placeholder='task name' value={this.state.newTaskName} onChange={(e) => this.setState({ newTaskName: e.target.value})}></input>
-				<select onChange={(e)=> this.setState({ newTaskTypeId: e.target.value})}>
+				<input type='text' id='new-task' placeholder='task name' 
+					value={this.state.newTaskName} 
+					onChange={(e) => this.setState({ newTaskName: e.target.value})}></input>
+				<select 
+					onChange={(e)=> this.setState({ newTaskTypeId: e.target.value})}>
 					{ tasksByType.map(type => {
 						return(
 							<option key={type.id} value={type.id}>{type.typeName}</option>
@@ -53,9 +56,10 @@ export default class App extends React.Component {
 				{ selectedType.length ? 
 					selectedType[0].tasks.map(task => {
 						return(
-							<li key={task.id}>{task.name}
-								<button className='delete' onClick={()=> this.deleteTask(task)}>X</button>
-							</li>
+							<p key={task.id}>
+								<button className='delete' onClick={()=> this.deleteTask(task)}>DONE</button>
+								{task.name}
+							</p>
 						)}) 
 					:
 					tasksByType.map(type => {
