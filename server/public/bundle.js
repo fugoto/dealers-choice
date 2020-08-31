@@ -113,9 +113,12 @@ class App extends react__WEBPACK_IMPORTED_MODULE_0___default.a.Component {
       types: [],
       tasks: [],
       tasksByType: [],
-      selectedType: []
+      selectedType: [],
+      newTaskName: '',
+      newTaskTypeId: ''
     };
     this.showTasks = this.showTasks.bind(this);
+    this.deleteTask = this.deleteTask.bind(this);
   }
 
   async componentDidMount() {
@@ -135,7 +138,22 @@ class App extends react__WEBPACK_IMPORTED_MODULE_0___default.a.Component {
   async deleteTask(task) {
     const updated = (await axios__WEBPACK_IMPORTED_MODULE_2___default.a.delete(`/api/tasks/${task.id}`)).data;
     this.setState({
-      tasks: updated
+      tasksByType: updated
+    });
+    this.setState({
+      selectedType: updated.filter(type => type.id === task.typeId)
+    });
+  }
+
+  async createTask(typeId, taskName) {
+    const updated = (await axios__WEBPACK_IMPORTED_MODULE_2___default.a.post(`/api/types/${typeId}`, {
+      name: taskName
+    })).data;
+    this.setState({
+      tasksByType: updated
+    });
+    this.setState({
+      selectedType: updated.filter(type => type.id === typeId)
     });
   }
 
@@ -144,11 +162,31 @@ class App extends react__WEBPACK_IMPORTED_MODULE_0___default.a.Component {
       tasksByType,
       selectedType
     } = this.state;
-    return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", null, selectedType.length ? selectedType[0].tasks.map(task => {
+    return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("label", null, "Create new task here: "), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("input", {
+      type: "text",
+      id: "new-task",
+      placeholder: "task name",
+      value: this.state.newTaskName,
+      onChange: e => this.setState({
+        newTaskName: e.target.value
+      })
+    }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("select", {
+      onChange: e => this.setState({
+        newTaskTypeId: e.target.value
+      })
+    }, tasksByType.map(type => {
+      return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("option", {
+        key: type.id,
+        value: type.id
+      }, type.typeName);
+    })), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
+      onClick: () => this.createTask(this.state.newTaskTypeId, this.state.newTaskName)
+    }, "Create new task"), selectedType.length ? selectedType[0].tasks.map(task => {
       return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("li", {
         key: task.id
       }, task.name, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
-        className: "delete"
+        className: "delete",
+        onClick: () => this.deleteTask(task)
       }, "X"));
     }) : tasksByType.map(type => {
       return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("h3", {

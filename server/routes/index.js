@@ -22,7 +22,7 @@ router.delete('/api/tasks/:id',async(req,res,next) => {
         const deletedId = req.params.id
         const deleted = await Tasks.findByPk(req.params.id)
         await deleted.destroy()
-        res.send(await Tasks.findAll())
+        res.send(await Types.findAll( {include: Tasks} ))
     }catch(error) { next(error) }
 })
 
@@ -33,6 +33,19 @@ router.get('/api/types', async(req,res,next) => {
         })
         res.send(types)
     }catch(error) { next(error) }
+})
+
+router.post('/api/types/:id',async(req,res,next) => {
+    try{
+        const typeId = req.params.id
+        const taskName = req.body.name
+        console.log(typeId, taskName)
+        const newTask = await Tasks.create({
+            name: taskName,
+            typeId: typeId
+        })
+        res.send(await Types.findAll( {include: Tasks} ))
+    } catch(err) { next(err) }
 })
 
 router.get('/api/types/:id',async(req,res,next)=>{
