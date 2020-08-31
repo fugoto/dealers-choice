@@ -5,6 +5,10 @@
 button {
     margin: 2px
 }
-/* #app {
-      
-} */
+.list {
+    display: flex
+}
+
+.types {
+    display: flex;
+}

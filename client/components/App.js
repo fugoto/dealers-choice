@@ -20,10 +20,26 @@ export default class App extends React.Component {
 	async componentDidMount(){
 		const tasksByType = (await axios.get('/api/types')).data
 		this.setState( {tasksByType} )
-	}
+		
+		const loadPage =async() => {
+			const typeId = window.location.hash.slice(1) * 1
+			const type = this.state.tasksByType.filter(type => type.id === typeId)[0]
+			this.showTasks(type)
+		}
+		window.addEventListener('hashchange',async()=>{
+			loadPage()
+		})
+		console.log(window.location.hash.slice(1))
+		if (window.location.hash.slice(1)) loadPage()
+		else {
+			const defaultType = this.state.tasksByType.filter(type => type.id === 1)[0]
+			this.showTasks(defaultType)
+			}
+		}
+	
 	async showTasks(type){
-		const selectedType = (await axios.get(`/api/types/${type.id}`)).data
-		this.setState( { selectedType } )
+		// const selectedType = (await axios.get(`/api/types/${type.id}`)).data
+		this.setState( { selectedType: [type] } )
 	}
 	async deleteTask(task){
 		const updated = (await axios.delete(`/api/tasks/${task.id}`)).data
@@ -39,7 +55,7 @@ export default class App extends React.Component {
 	render(){
 		const { tasksByType, selectedType } = this.state
 		return(
-			<div>
+			<div id='container'>
 				<label>Create new task here: </label>
 				<input type='text' id='new-task' placeholder='task name' 
 					value={this.state.newTaskName} 
@@ -53,21 +69,31 @@ export default class App extends React.Component {
 					})}
 				</select>
 				<button onClick={()=> this.createTask(this.state.newTaskTypeId, this.state.newTaskName)}>Create new task</button>
+				<div id='list'>
+				<section id='types'>
+				{tasksByType.map(type => {
+						return(
+							<p key={type.id}>
+							<a href={`#${type.id}`} className='tasks' onClick={()=> this.showTasks(type)}>{type.typeName} ({type.tasks.length})</a>
+							</p>
+						)
+					})
+				}
+				</section>
+				<section>
 				{ selectedType.length ? 
 					selectedType[0].tasks.map(task => {
 						return(
 							<p key={task.id}>
-								<button className='delete' onClick={()=> this.deleteTask(task)}>DONE</button>
+								<button className='delete' onClick={()=> this.deleteTask(task)}>DONE! GTFO</button>
 								{task.name}
 							</p>
 						)}) 
 					:
-					tasksByType.map(type => {
-						return(
-							<h3 id={type.id} key={type.id} className='tasks' onClick={()=> this.showTasks(type)}>{type.typeName} ({type.tasks.length})</h3>
-						)
-					})
+					null
 				}
+				</section>
+				</div>
 			</div>
 		)
 	}
