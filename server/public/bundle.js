@@ -102,23 +102,28 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var react_dom__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(react_dom__WEBPACK_IMPORTED_MODULE_1__);
 /* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! axios */ "./node_modules/axios/index.js");
 /* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(axios__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */ var _ListTypes__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./ListTypes */ "./client/components/ListTypes.js");
+/* harmony import */ var _ListTasks__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./ListTasks */ "./client/components/ListTasks.js");
 
 
- //import any sub-components
+
+
 
 class App extends react__WEBPACK_IMPORTED_MODULE_0___default.a.Component {
   constructor() {
     super();
     this.state = {
-      types: [],
-      tasks: [],
       tasksByType: [],
       selectedType: [],
-      newTaskName: '',
-      newTaskTypeId: ''
+      newTaskName: "",
+      newTaskTypeId: 0,
+      newTypeName: "",
+      errorMsg: ""
     };
     this.showTasks = this.showTasks.bind(this);
     this.deleteTask = this.deleteTask.bind(this);
+    this.createTask = this.createTask.bind(this);
+    this.deleteType = this.deleteType.bind(this);
   }
 
   async componentDidMount() {
@@ -136,7 +141,6 @@ class App extends react__WEBPACK_IMPORTED_MODULE_0___default.a.Component {
     window.addEventListener('hashchange', async () => {
       loadPage();
     });
-    console.log(window.location.hash.slice(1));
     if (window.location.hash.slice(1)) loadPage();else {
       const defaultType = this.state.tasksByType.filter(type => type.id === 1)[0];
       this.showTasks(defaultType);
@@ -144,9 +148,9 @@ class App extends react__WEBPACK_IMPORTED_MODULE_0___default.a.Component {
   }
 
   async showTasks(type) {
-    // const selectedType = (await axios.get(`/api/types/${type.id}`)).data
+    const selectedType = (await axios__WEBPACK_IMPORTED_MODULE_2___default.a.get(`/api/types/${type.id}`)).data;
     this.setState({
-      selectedType: [type]
+      selectedType: selectedType
     });
   }
 
@@ -161,14 +165,40 @@ class App extends react__WEBPACK_IMPORTED_MODULE_0___default.a.Component {
   }
 
   async createTask(typeId, taskName) {
-    const updated = (await axios__WEBPACK_IMPORTED_MODULE_2___default.a.post(`/api/types/${typeId}`, {
-      name: taskName
-    })).data;
+    try {
+      const updated = (await axios__WEBPACK_IMPORTED_MODULE_2___default.a.post(`/api/types/${parseInt(typeId)}`, {
+        name: taskName
+      })).data;
+      this.setState({
+        tasksByType: updated
+      });
+      this.setState({
+        selectedType: updated.filter(type => type.id === parseInt(typeId))
+      });
+    } catch {
+      this.setState({
+        errorMsg: 'Idiot'
+      });
+    }
+  }
+
+  async createType(typeName) {
+    if (typeName) {
+      const updated = (await axios__WEBPACK_IMPORTED_MODULE_2___default.a.post(`/api/types/`, {
+        name: typeName
+      })).data;
+      this.setState({
+        tasksByType: updated
+      });
+    } else this.setState({
+      errorMsg: 'Idiot'
+    });
+  }
+
+  async deleteType(type) {
+    const updated = (await axios__WEBPACK_IMPORTED_MODULE_2___default.a.delete(`/api/types/${type.id}`)).data;
     this.setState({
       tasksByType: updated
-    });
-    this.setState({
-      selectedType: updated.filter(type => type.id === typeId)
     });
   }
 
@@ -179,6 +209,22 @@ class App extends react__WEBPACK_IMPORTED_MODULE_0___default.a.Component {
     } = this.state;
     return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
       id: "container"
+    }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("p", {
+      className: "error"
+    }, this.state.errorMsg), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+      className: "create"
+    }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("label", null, "Create new task category here: "), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("input", {
+      type: "text",
+      id: "new-type",
+      placeholder: "task category name",
+      value: this.state.newTypeName,
+      onChange: e => this.setState({
+        newTypeName: e.target.value
+      })
+    }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
+      onClick: () => this.createType(this.state.newTypeName)
+    }, "Create new category")), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+      className: "create"
     }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("label", null, "Create new task here: "), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("input", {
       type: "text",
       id: "new-task",
@@ -188,39 +234,107 @@ class App extends react__WEBPACK_IMPORTED_MODULE_0___default.a.Component {
         newTaskName: e.target.value
       })
     }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("select", {
+      value: this.state.newTaskTypeId,
       onChange: e => this.setState({
         newTaskTypeId: e.target.value
       })
-    }, tasksByType.map(type => {
+    }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("option", null, "Select category:"), tasksByType.map(type => {
       return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("option", {
         key: type.id,
         value: type.id
       }, type.typeName);
     })), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
       onClick: () => this.createTask(this.state.newTaskTypeId, this.state.newTaskName)
-    }, "Create new task"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+    }, "Create new task")), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
       id: "list"
-    }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("section", {
+    }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
       id: "types"
-    }, tasksByType.map(type => {
-      return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("p", {
-        key: type.id
-      }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("a", {
-        href: `#${type.id}`,
-        className: "tasks",
-        onClick: () => this.showTasks(type)
-      }, type.typeName, " (", type.tasks.length, ")"));
-    })), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("section", null, selectedType.length ? selectedType[0].tasks.map(task => {
-      return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("p", {
+    }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("h1", {
+      className: "header"
+    }, "Categories"), tasksByType.map(type => {
+      return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_ListTypes__WEBPACK_IMPORTED_MODULE_3__["default"], {
+        type: type,
+        showTasks: this.showTasks,
+        key: type.id,
+        selectedType: this.state.selectedType,
+        deleteType: this.deleteType
+      });
+    })), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+      id: "tasks"
+    }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("h1", {
+      className: "header"
+    }, "Tasks"), selectedType.length ? selectedType[0].tasks.map(task => {
+      return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_ListTasks__WEBPACK_IMPORTED_MODULE_4__["default"], {
+        task: task,
+        deleteTask: this.deleteTask,
         key: task.id
-      }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
-        className: "delete",
-        onClick: () => this.deleteTask(task)
-      }, "DONE! GTFO"), task.name);
+      });
     }) : null)));
   }
 
 }
+
+/***/ }),
+
+/***/ "./client/components/ListTasks.js":
+/*!****************************************!*\
+  !*** ./client/components/ListTasks.js ***!
+  \****************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
+
+
+function ListTasks(props) {
+  const task = props.task;
+  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("p", {
+    key: task.id,
+    className: "task-item"
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
+    className: "delete",
+    onClick: () => props.deleteTask(task)
+  }, "DONE! GTFO"), task.name);
+}
+
+/* harmony default export */ __webpack_exports__["default"] = (ListTasks);
+
+/***/ }),
+
+/***/ "./client/components/ListTypes.js":
+/*!****************************************!*\
+  !*** ./client/components/ListTypes.js ***!
+  \****************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
+
+
+function ListTypes(props) {
+  const {
+    id,
+    typeName,
+    tasks
+  } = props.type;
+  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("p", {
+    className: "type-item"
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
+    onClick: () => props.deleteType(props.type)
+  }, "X"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("a", {
+    href: `#${id}`,
+    onClick: () => props.showTasks(props.type),
+    className: props.selectedType[0] && props.selectedType[0].id === id ? "type selected" : "type"
+  }, typeName, " (", tasks.length, ")"));
+}
+
+/* harmony default export */ __webpack_exports__["default"] = (ListTypes);
 
 /***/ }),
 

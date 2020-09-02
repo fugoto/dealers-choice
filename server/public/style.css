@@ -1,14 +1,66 @@
 * {
-    color: black
+    color: black;
+    font-family: Verdana, Geneva, Tahoma, sans-serif
 }
 
-button {
-    margin: 2px
+.delete {
+    margin-top: 10px;
+    margin-bottom: 10px;
+    margin-right: 10px;
+    margin-left: 200px;
 }
-.list {
+#list {
     display: flex
 }
 
 .types {
     display: flex;
+}
+
+.selected {
+    background-color: limegreen;
+}
+
+#types {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    width: 50%;
+    text-align: center;
+    border: solid 5px limegreen;
+    margin: 10px
+}
+
+.type {
+    margin: 20px;
+    font-size: 2rem
+}
+
+.type-item {
+    padding: 20px;
+}
+
+#tasks {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    width: 50%;
+    border: solid 5px dodgerblue;
+    margin: 10px
+}
+
+.create {
+    margin: 10px
+}
+
+label {
+    font-weight: bold
+}
+
+.header {
+    text-align: center
+}
+
+.error {
+    color: red
 }

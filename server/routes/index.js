@@ -1,8 +1,6 @@
 const router = require("express").Router()
-//import models from /db
 const { Tasks, Types, db } = require('../db')
 
-//routes go here
 router.get('/', async(req,res,next) => {
     try{
         res.sendFile(path.join(__dirname, 'index.html'))
@@ -35,17 +33,33 @@ router.get('/api/types', async(req,res,next) => {
     }catch(error) { next(error) }
 })
 
+router.post('/api/types', async(req,res,next) => {
+    try{
+        const newTypeName = req.body.name
+        await Types.create({typeName : newTypeName})
+        res.send(await Types.findAll( {include : Tasks} ))
+    } catch(err){ (next(err)) }
+})
+
 router.post('/api/types/:id',async(req,res,next) => {
     try{
         const typeId = req.params.id
         const taskName = req.body.name
-        console.log(typeId, taskName)
         const newTask = await Tasks.create({
             name: taskName,
             typeId: typeId
         })
         res.send(await Types.findAll( {include: Tasks} ))
     } catch(err) { next(err) }
+})
+
+router.delete('/api/types/:id',async(req,res,next) => {
+    try{
+        const deletedId = req.params.id
+        const deleted = await Types.findByPk(req.params.id)
+        await deleted.destroy()
+        res.send(await Types.findAll( {include: Tasks} ))
+    }catch(error) { next(error) }
 })
 
 router.get('/api/types/:id',async(req,res,next)=>{
