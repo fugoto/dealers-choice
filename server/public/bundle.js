@@ -141,17 +141,19 @@ class App extends react__WEBPACK_IMPORTED_MODULE_0___default.a.Component {
     window.addEventListener('hashchange', async () => {
       loadPage();
     });
-    if (window.location.hash.slice(1)) loadPage();else {
+    if (window.location.hash.slice(1)) loadPage();else if (this.state.tasksByType.length) {
       const defaultType = this.state.tasksByType.filter(type => type.id === 1)[0];
       this.showTasks(defaultType);
     }
   }
 
   async showTasks(type) {
-    const selectedType = (await axios__WEBPACK_IMPORTED_MODULE_2___default.a.get(`/api/types/${type.id}`)).data;
-    this.setState({
-      selectedType: selectedType
-    });
+    if (type) {
+      const selectedType = (await axios__WEBPACK_IMPORTED_MODULE_2___default.a.get(`/api/types/${type.id}`)).data;
+      this.setState({
+        selectedType: selectedType
+      });
+    }
   }
 
   async deleteTask(task) {

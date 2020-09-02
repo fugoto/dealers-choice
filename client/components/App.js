@@ -33,15 +33,19 @@ export default class App extends React.Component {
 			loadPage()
 		})
 		if (window.location.hash.slice(1)) loadPage()
-		else {
+		else if(this.state.tasksByType.length)
+			{
 			const defaultType = this.state.tasksByType.filter(type => type.id === 1)[0]
 			this.showTasks(defaultType)
 			}
 		}
 	
 	async showTasks(type){
-		const selectedType = (await axios.get(`/api/types/${type.id}`)).data
+		if(type){
+			const selectedType = (await axios.get(`/api/types/${type.id}`)).data
 		this.setState( { selectedType: selectedType } )
+		}
+		
 	}
 	async deleteTask(task){
 		const updated = (await axios.delete(`/api/tasks/${task.id}`)).data
